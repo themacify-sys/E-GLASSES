@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-GLASSES | Queue Management System</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div class="logo-container">
+            <i class="fa-solid => fa-glasses logo-icon"></i>
+            <h2>E-GLASSES <span>QMS</span></h2>
+        </div>
+        <div class="date-display">
+            <i class="fa-regular fa-calendar-days"></i> <span id="currentDate"></span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        
+        <!-- Top Live Counters -->
+        <section class="counter-grid">
+            <div class="card card-total">
+                <i class="fa-solid fa-users icon"></i>
+                <div>
+                    <h3>कुल कस्टमर (Today)</h3>
+                    <p id="totalCount">0</p>
+                </div>
+            </div>
+            <div class="card card-shopping">
+                <i class="fa-solid fa-cart-shopping icon"></i>
+                <div>
+                    <h3>Shopping Queue</h3>
+                    <p id="shoppingCount">0</p>
+                </div>
+            </div>
+            <div class="card card-eyetest">
+                <i class="fa-solid fa-eye icon"></i>
+                <div>
+                    <h3>Eye Test Queue</h3>
+                    <p id="eyetestCount">0</p>
+                </div>
+            </div>
+            <div class="card card-repair">
+                <i class="fa-solid fa-wrench icon"></i>
+                <div>
+                    <h3>Repair Queue</h3>
+                    <p id="repairCount">0</p>
+                </div>
+            </div>
+            <div class="card card-pickup">
+                <i class="fa-solid fa-box-archive icon"></i>
+                <div>
+                    <h3>Pickup Queue</h3>
+                    <p id="pickupCount">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Layout (Split Screen) -->
+        <div class="content-split">
+            
+            <!-- Left Side: Registration Form -->
+            <section class="form-section">
+                <div class="form-card">
+                    <h3><i class="fa-solid fa-user-plus"></i> नया कस्टमर जोड़ें</h3>
+                    <form id="customerForm">
+                        
+                        <div class="input-group">
+                            <label for="custName"><i class="fa-solid fa-user"></i> कस्टमर का नाम</label>
+                            <input type="text" id="custName" placeholder="नाम लिखें..." required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="custMobile"><i class="fa-solid fa-phone"></i> मोबाइल / WhatsApp नंबर</label>
+                            <input type="tel" id="custMobile" placeholder="+91 9999999999" pattern="[0-9]{10}" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label><i class="fa-solid fa-venus-mars"></i> जेंडर</label>
+                            <div class="gender-options">
+                                <label><input type="radio" name="gender" value="Male" checked> Male</label>
+                                <label><input type="radio" name="gender" value="Female"> Female</label>
+                                <label><input type="radio" name="gender" value="Kids"> Kids</label>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="custPhoto"><i class="fa-solid fa-camera"></i> कस्टमर फ़ोटो (ऐच्छिक)</label>
+                            <input type="file" id="custPhoto" accept="image/*" capture="environment">
+                            <div id="photoPreviewContainer" class="hidden">
+                                <img id="photoPreview" src="" alt="Preview">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="visitReason"><i class="fa-solid fa-list-check"></i> आने का कारण (Reason for Visit)</label>
+                            <select id="visitReason" required onchange="toggleSubCategory()">
+                                <option value="" disabled selected>चुनें...</option>
+                                <option value="Shopping">1. SHOPPING</option>
+                                <option value="Eye Test">2. EYE TEST</option>
+                                <option value="Repair">3. REPAIR</option>
+                                <option value="Pickup">4. PICKUP</option>
+                            </select>
+                        </div>
+
+                        <!-- Sub-Category for Shopping -->
+                        <div class="input-group hidden" id="subCategoryGroup">
+                            <label for="subCategory"><i class="fa-solid fa-tags"></i> शॉपिंग प्रकार</label>
+                            <select id="subCategory">
+                                <option value="Eyeglasses">Eyeglasses (चश्मे)</option>
+                                <option value="Sunglasses">Sunglasses (सनग्लासेस)</option>
+                                <option value="Contact Lenses">Contact Lenses (कॉन्टैक्ट लेंस)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-plus"></i> कस्टमर टोकन जनरेट करें & WhatsApp भेजें
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Right Side: Real-time Live Queue List -->
+            <section class="queue-section">
+                <div class="queue-card">
+                    <div class="queue-header">
+                        <h3><i class="fa-solid fa-list-ol"></i> लाइव कतार (Serial-Wise Token Queue)</h3>
+                        <button class="btn-secondary" onclick="exportDailyReport()"><i class="fa-solid fa-file-excel"></i> आज की रिपोर्ट डाउनलोड करें</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="queue-table">
+                            <thead>
+                                <tr>
+                                    <th>टोकन #</th>
+                                    <th>फ़ोटो</th>
+                                    <th>नाम</th>
+                                    <th>नंबर</th>
+                                    <th>कारण</th>
+                                    <th>समय</th>
+                                    <th>एक्शन</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queueListBody">
+                                <!-- Dynamic Queue Data Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer & Privacy Policy Notice -->
+    <footer class="footer">
+        <p>&copy; 2026 E-GLASSES Queue Management System. All Rights Reserved.</p>
+        <p><a href="#" onclick="openPrivacyModal()">Privacy Policy & Data Security Notice</a></p>
+    </footer>
+
+    <!-- Privacy Policy Modal Window -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closePrivacyModal()">&times;</span>
+            <h2><i class="fa-solid fa-shield-halved"></i> प्राइवेसी पॉलिसी एवं डेटा सुरक्षा गाइडलाइंस</h2>
+            <hr>
+            <p><strong>1. स्थानिक डेटा स्टोरेज (Local Storage & Data Privacy):</strong> यह एप्लिकेशन पूर्ण रूप से इन-हाउस (Shop Local Storage) पर आधारित है। आपके ग्राहकों का पर्सनल डेटा, जैसे मोबाइल नंबर व तस्वीरें, केवल आपके लोकल ब्राउज़र/सिस्टम में सुरक्षित रखी जाती हैं और किसी बाहरी थर्ड-पार्टी सर्वर पर शेयर नहीं की जाती हैं।</p>
+            <p><strong>2. ऑटो-आर्काइविंग लॉजिक:</strong> दैनिक ग्राहकों की कतार हर रात 12 बजे के बाद ऑटो-आर्काइव फ़ाइल में स्थानांतरित कर दी जाती है ताकि अगले दिन की कतार (Serial Queue) बिल्कुल साफ़ और व्यवस्थित रहे।</p>
+            <p><strong>3. सुरक्षित व्हाट्सएप इंटेंट:</strong> ग्राहकों को संदेश भेजने के लिए सीधे आपके सिस्टम के व्हाट्सएप एप्लिकेशन अथवा व्हाट्सएप वेब का आधिकारिक डायरेक्ट लिंक (WhatsApp Intent Protocol) उपयोग किया जाता है, जो पूरी तरह से सुरक्षित है।</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
